@@ -22,10 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +42,19 @@ public class ChessRendererTests {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Unable to create MD5 from: " + s, e);
         }
+    }
+
+    private static File createFile(String name) {
+        final File f;
+        final var targetDir = new File("target");
+        if (targetDir.exists() && targetDir.isDirectory()) {
+            final var parent = new File(targetDir, "generated-test-files");
+            parent.mkdirs();
+            f = new File(parent, name);
+        } else {
+            f = new File(name);
+        }
+        return f;
     }
 
     @Test
@@ -92,7 +102,7 @@ public class ChessRendererTests {
                 "brown", ChessThemeLibrary.BROWN_THEME
         );
         for (final var e : themes.entrySet()) {
-            try (final var out = new FileOutputStream("%s-%s.png".formatted(md5(fen), e.getKey()))) {
+            try (final var out = new FileOutputStream(createFile("%s-%s.png".formatted(md5(fen), e.getKey())))) {
                 new ChessRenderer(e.getValue(), 40).render(fen, out);
             }
         }
@@ -101,7 +111,7 @@ public class ChessRendererTests {
     @Test
     void testHighlightSquare() throws IOException {
         final var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        new ChessRenderer().render(fen, new FileOutputStream("highlight.png"), new Function<ChessSquare, Optional<Color>>() {
+        new ChessRenderer().render(fen, new FileOutputStream(createFile("highlight.png")), new Function<ChessSquare, Optional<Color>>() {
             @Override
             public Optional<Color> apply(ChessSquare sq) {
                 if (sq.col() == 7 && sq.row() == 7) {
