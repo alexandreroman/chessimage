@@ -21,7 +21,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +69,7 @@ public class ChessRenderer {
     /**
      * Cache for piece images to avoid reloading them
      */
-    private final Map<Piece, BufferedImage> pieceImages = new HashMap<>(12);
+    private final Map<ChessPiece, BufferedImage> pieceImages = new HashMap<>(12);
 
     /**
      * Creates a ChessRenderer with the default green theme and standard square size.
@@ -112,38 +111,17 @@ public class ChessRenderer {
 
     /**
      * Loads all piece images from resources into memory.
-     * The naming convention for resource files is: assets/[piece letter][color].png
-     * where piece letter is r(rook), n(knight), b(bishop), q(queen), k(king), p(pawn)
-     * and color is l(light/white) or d(dark/black).
      *
      * @throws IOException If any piece image cannot be loaded
      */
     private void loadPieceImages() throws IOException {
-        for (final Piece piece : Piece.all()) {
-            // Determine the character used in the filename based on piece type
-            final var fenCharacter = switch (piece.type) {
-                case ROOK -> "r";
-                case KNIGHT -> "n";
-                case BISHOP -> "b";
-                case QUEEN -> "q";
-                case KING -> "k";
-                case PAWN -> "p";
-            };
-
-            // Determine the color suffix used in the filename
-            final var resColor = switch (piece.side) {
-                case WHITE -> "l";
-                case BLACK -> "d";
-            };
-
-            final var resPath = "assets/" + fenCharacter + resColor + ".png";
-            try (final var resIn = ChessRenderer.class.getResourceAsStream(resPath)) {
-                if (resIn == null) {
-                    throw new IOException("Failed to load piece image " + piece + " from path: " + resPath);
-                }
-                final var resImage = ImageIO.read(resIn);
-                pieceImages.put(piece, resImage);
+        for (final ChessPiece piece : ChessPiece.all()) {
+            final var res = theme.assets().apply(piece);
+            if (res == null) {
+                throw new IOException("Failed to load piece image " + piece);
             }
+            final var resImage = ImageIO.read(res);
+            pieceImages.put(piece, resImage);
         }
     }
 
@@ -313,7 +291,7 @@ public class ChessRenderer {
                     col += Character.getNumericValue(c);
                 } else {
                     // Letters represent pieces
-                    final var pieceImage = pieceImages.get(Piece.fromFenCharacter(c));
+                    final var pieceImage = pieceImages.get(ChessPiece.fromFenCharacter(c));
                     if (pieceImage != null) {
                         int x = col * squareSize;
                         int y = row * squareSize;
@@ -330,81 +308,4 @@ public class ChessRenderer {
         }
     }
 
-    /**
-     * Represents the two sides in a chess game.
-     */
-    private enum Side {
-        WHITE, BLACK
-    }
-
-    /**
-     * Represents the six different types of chess pieces.
-     */
-    private enum PieceType {
-        ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN
-    }
-
-    /**
-     * Represents a chess piece with its type and side.
-     * Each piece is represented as a record containing a piece type and the side (color) it belongs to.
-     */
-    private record Piece(
-            PieceType type,
-            Side side
-    ) {
-        /**
-         * Mapping from FEN characters to piece objects
-         */
-        private static final Map<Character, Piece> PIECES = new HashMap<>(12);
-
-        // Initialize the mapping of FEN characters to Piece objects
-        static {
-            PIECES.put('R', new Piece(PieceType.ROOK, Side.WHITE));
-            PIECES.put('r', new Piece(PieceType.ROOK, Side.BLACK));
-            PIECES.put('N', new Piece(PieceType.KNIGHT, Side.WHITE));
-            PIECES.put('n', new Piece(PieceType.KNIGHT, Side.BLACK));
-            PIECES.put('B', new Piece(PieceType.BISHOP, Side.WHITE));
-            PIECES.put('b', new Piece(PieceType.BISHOP, Side.BLACK));
-            PIECES.put('Q', new Piece(PieceType.QUEEN, Side.WHITE));
-            PIECES.put('q', new Piece(PieceType.QUEEN, Side.BLACK));
-            PIECES.put('K', new Piece(PieceType.KING, Side.WHITE));
-            PIECES.put('k', new Piece(PieceType.KING, Side.BLACK));
-            PIECES.put('P', new Piece(PieceType.PAWN, Side.WHITE));
-            PIECES.put('p', new Piece(PieceType.PAWN, Side.BLACK));
-        }
-
-        /**
-         * Returns a collection of all possible chess pieces.
-         *
-         * @return A collection containing all 12 possible pieces (6 types × 2 sides)
-         */
-        static Collection<Piece> all() {
-            return PIECES.values();
-        }
-
-        /**
-         * Converts a FEN character to the corresponding Piece object.
-         *
-         * @param p The FEN character representing a piece
-         * @return The corresponding Piece object
-         * @throws IllegalArgumentException If the character doesn't represent a valid piece
-         */
-        static Piece fromFenCharacter(char p) {
-            final var piece = PIECES.get(p);
-            if (piece == null) {
-                throw new IllegalArgumentException("Unknown piece: " + p);
-            }
-            return piece;
-        }
-
-        /**
-         * Returns a string representation of this piece.
-         *
-         * @return A string in the format "side type" (e.g., "white queen")
-         */
-        @Override
-        public String toString() {
-            return side.name().toLowerCase() + " " + type.name().toLowerCase();
-        }
-    }
 }

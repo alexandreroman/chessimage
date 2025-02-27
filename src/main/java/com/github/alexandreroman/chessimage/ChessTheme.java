@@ -17,6 +17,8 @@
 package com.github.alexandreroman.chessimage;
 
 import java.awt.*;
+import java.net.URL;
+import java.util.function.Function;
 
 /**
  * Represents a visual theme for a chess board.
@@ -38,9 +40,49 @@ import java.awt.*;
  *
  * @param lightColor The color for light squares on the chess board
  * @param darkColor  The color for dark squares on the chess board
+ * @param assets     A function to load assets for piece images
  */
 public record ChessTheme(
         Color lightColor,
-        Color darkColor
+        Color darkColor,
+        Function<ChessPiece, URL> assets
 ) {
+    private static final Function<ChessPiece, URL> DEFAULT_ASSETS_LOADER = new Function<ChessPiece, URL>() {
+        /*
+         * The naming convention for resource files is: assets/[piece letter][color].png
+         * where piece letter is r(rook), n(knight), b(bishop), q(queen), k(king), p(pawn)
+         * and color is l(light/white) or d(dark/black).
+         */
+        @Override
+        public URL apply(ChessPiece piece) {
+            // Determine the character used in the filename based on piece type
+            final var fenCharacter = switch (piece.type()) {
+                case ROOK -> "r";
+                case KNIGHT -> "n";
+                case BISHOP -> "b";
+                case QUEEN -> "q";
+                case KING -> "k";
+                case PAWN -> "p";
+            };
+
+            // Determine the color suffix used in the filename
+            final var resColor = switch (piece.side()) {
+                case WHITE -> "l";
+                case BLACK -> "d";
+            };
+
+            final var resPath = "assets/" + fenCharacter + resColor + ".png";
+            return ChessTheme.class.getResource(resPath);
+        }
+    };
+
+    public ChessTheme(Color lightColor, Color darkColor, Function<ChessPiece, URL> assets) {
+        this.lightColor = lightColor;
+        this.darkColor = darkColor;
+        this.assets = assets;
+    }
+
+    public ChessTheme(Color lightColor, Color darkColor) {
+        this(lightColor, darkColor, DEFAULT_ASSETS_LOADER);
+    }
 }
