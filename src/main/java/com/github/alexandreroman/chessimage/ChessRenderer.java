@@ -271,7 +271,7 @@ public class ChessRenderer {
 
                 // Draw row numbers on the leftmost column
                 if (col == 0) {
-                    String rowNumber = String.valueOf(8 - row);
+                    final var rowNumber = String.valueOf(8 - row);
                     g.drawString(rowNumber,
                             x + squareSize / 12,
                             y + fm.getAscent() + squareSize / 12);
@@ -279,7 +279,7 @@ public class ChessRenderer {
 
                 // Draw column letters on the bottom row
                 if (row == 7) {
-                    String colLetter = String.valueOf((char) ('A' + col));
+                    final var colLetter = String.valueOf((char) ('a' + col));
                     g.drawString(colLetter,
                             x + squareSize - fm.stringWidth(colLetter) - squareSize / 12,
                             y + squareSize - squareSize / 12);
