@@ -171,31 +171,59 @@ public class ChessRenderer {
      * @throws NullPointerException If fen or out is null
      */
     public void render(String fen, OutputStream out, Function<ChessSquare, Optional<Color>> squareHighlighter) throws IOException {
-        requireNonNull(fen, "FEN must not be null");
         requireNonNull(out, "Output stream must not be null");
+
+        // Create a new image with dimensions that fit the 8x8 chess board
+        final var imageWidth = squareSize * 8;
+        final var image = new BufferedImage(imageWidth, imageWidth, BufferedImage.TYPE_INT_ARGB);
+        render(fen, image, squareHighlighter);
+
+        // Write the image to the output stream as PNG
+        ImageIO.write(image, "PNG", out);
+    }
+
+    /**
+     * Renders a chess position from FEN notation to an image with optional square highlighting.
+     *
+     * @param fen               The chess position in FEN notation
+     * @param image             The image where to render the board
+     * @param squareHighlighter A function that returns an optional color for each square,
+     *                          which will be used to highlight the square if present
+     * @throws NullPointerException If fen or image is null
+     */
+    public void render(String fen, BufferedImage image, Function<ChessSquare, Optional<Color>> squareHighlighter) {
+        requireNonNull(fen, "FEN must not be null");
+        requireNonNull(image, "Image must not be null");
 
         if (squareHighlighter == null) {
             squareHighlighter = sq -> Optional.empty();
         }
 
-        // Create a new image with dimensions that fit the 8x8 chess board
-        final var imageWidth = squareSize * 8;
-        final var image = new BufferedImage(imageWidth, imageWidth, BufferedImage.TYPE_INT_ARGB);
-        final var g = image.createGraphics();
-
         // Enable anti-aliasing for better visual quality
+        final var g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        // Draw the board, coordinates, and pieces
-        drawBoard(g, squareHighlighter);
-        drawCoordinates(g);
-        drawPiecesFromFEN(g, fen);
-        g.dispose();
+        try {
+            // Draw the board, coordinates, and pieces
+            drawBoard(g, squareHighlighter);
+            drawCoordinates(g);
+            drawPiecesFromFEN(g, fen);
+        } finally {
+            g.dispose();
+        }
+    }
 
-        // Write the image to the output stream as PNG
-        ImageIO.write(image, "PNG", out);
+    /**
+     * Renders a chess position from FEN notation to an image.
+     *
+     * @param fen   The chess position in FEN notation
+     * @param image The image where to render the board
+     * @throws NullPointerException If fen or image is null
+     */
+    public void render(String fen, BufferedImage image) {
+        render(fen, image, null);
     }
 
     /**
