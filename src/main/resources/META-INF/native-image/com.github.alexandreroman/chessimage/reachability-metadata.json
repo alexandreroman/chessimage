@@ -1,0 +1,7 @@
+{
+  "resources": [
+    {
+      "glob": "com/github/alexandreroman/chessimage/assets/**"
+    }
+  ]
+}
