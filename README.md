@@ -40,7 +40,7 @@ Then add the dependency:
 <dependency>
     <groupId>com.github.alexandreroman</groupId>
     <artifactId>chessimage</artifactId>
-    <version>v1</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -60,12 +60,12 @@ Then add the dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.alexandreroman:chessimage:v1'
+    implementation 'com.github.alexandreroman:chessimage:1.0.0'
 }
 ```
 
-This will use the stable `v1` release.
-If you want to use a different version, replace `v1` with another release tag or commit hash.
+This will use the stable `1.0.0` release.
+If you want to use a different version, replace `1.0.0` with another release tag or commit hash.
 
 ## Usage
 
