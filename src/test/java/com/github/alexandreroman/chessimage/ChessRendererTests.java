@@ -126,4 +126,10 @@ public class ChessRendererTests {
             return Optional.empty();
         });
     }
+
+    @Test
+    void testNoHighlightedSquares() throws IOException {
+        final var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        new ChessRenderer().render(fen, new FileOutputStream(createFile("no-highlight.png")), sq -> Optional.empty());
+    }
 }
