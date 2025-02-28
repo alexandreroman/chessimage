@@ -16,6 +16,7 @@
 
 package com.github.alexandreroman.chessimage;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,7 +30,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,6 +55,11 @@ public class ChessRendererTests {
             f = new File(name);
         }
         return f;
+    }
+
+    @BeforeAll
+    public static void beforeAll() {
+        System.setProperty("java.awt.headless", "true");
     }
 
     @Test
