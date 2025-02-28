@@ -111,17 +111,14 @@ public class ChessRendererTests {
     @Test
     void testHighlightSquare() throws IOException {
         final var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        new ChessRenderer().render(fen, new FileOutputStream(createFile("highlight.png")), new Function<ChessSquare, Optional<Color>>() {
-            @Override
-            public Optional<Color> apply(ChessSquare sq) {
-                if (sq.col() == 7 && sq.row() == 7) {
-                    return Optional.of(Color.YELLOW);
-                }
-                if (sq.col() == 4 && sq.row() == 7) {
-                    return Optional.of(Color.RED);
-                }
-                return Optional.empty();
+        new ChessRenderer().render(fen, new FileOutputStream(createFile("highlight.png")), sq -> {
+            if (sq.col() == 7 && sq.row() == 7) {
+                return Optional.of(Color.YELLOW);
             }
+            if (sq.col() == 4 && sq.row() == 7) {
+                return Optional.of(Color.RED);
+            }
+            return Optional.empty();
         });
     }
 }

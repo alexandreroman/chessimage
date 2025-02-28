@@ -24,11 +24,6 @@ import java.util.function.Function;
  * Represents a visual theme for a chess board.
  * A chess theme defines the colors used for light and dark squares on the board.
  *
- * <p>This record encapsulates the two colors that define a chess board's appearance.
- * Using Java's record feature, it provides immutable storage of the theme colors
- * along with automatically generated constructors, accessors, equals, hashCode,
- * and toString methods.
- *
  * <p>Example usage:
  * <pre>
  * // Create a custom blue theme
@@ -37,6 +32,8 @@ import java.util.function.Function;
  *     new Color(70, 130, 180)    // Steel blue for dark squares
  * );
  * </pre>
+ *
+ * You can also customize piece images by providing a function to load assets.
  *
  * @param lightColor The color for light squares on the chess board
  * @param darkColor  The color for dark squares on the chess board

@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  *
  * <p>The class provides functionality to:
  * <ul>
- *   <li>Render chess positions from FEN notation to PNG images</li>
+ *   <li>Render chess positions from FEN notation to images</li>
  *   <li>Customize board colors using themes</li>
  *   <li>Adjust the size of the chess board</li>
  *   <li>Highlight specific squares on the board</li>
@@ -238,11 +238,7 @@ public class ChessRenderer {
             for (int col = 0; col < 8; col++) {
                 // Use contrasting color for coordinates
                 final var isLightSquare = (row + col) % 2 == 0;
-                if (isLightSquare) {
-                    g.setColor(theme.darkColor());
-                } else {
-                    g.setColor(theme.lightColor());
-                }
+                g.setColor(isLightSquare ? theme.darkColor() : theme.lightColor());
 
                 final int x = col * squareSize;
                 final int y = row * squareSize;
